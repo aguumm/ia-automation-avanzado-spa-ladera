@@ -1,0 +1,243 @@
+{
+  "name": "Spa Ladera",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "lastNode"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "326d0bf7-2965-4704-9d8e-5c28d18cc9e8",
+      "name": "Chat Trigger - Spa Ladera",
+      "webhookId": "001c54a1-ddab-4c86-b561-4ca8a64990ae"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Fecha y hora actual de Argentina: {{ $now.setZone('America/Argentina/Buenos_Aires').toFormat('yyyy-MM-dd HH:mm:ss') }}\n\nSolicitud del usuario: {{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "Sos el Recepcionista Virtual del Spa Ladera, en Bariloche.  \nHablás en español rioplatense, tono amable, claro y directo, como quien atiende en recepción.\n\nTu trabajo es consultar disponibilidad real, responder FAQs oficiales y agendar turnos.  \nUsá las herramientas conectadas (Google Calendar y Gmail) siempre que necesites datos actualizados. No inventes nada.\n\nREGLA OBLIGATORIA DE SALUDO\n- Si es el primer mensaje de la conversación, la respuesta DEBE empezar exactamente con: Hola [nombre] 👋\n- Si ya hay mensajes anteriores, NO saludes ni pongas emoji.\n- Siempre terminá la respuesta con: Cualquier otra consulta, estoy a tu disposición.\n\nALCANCE\nPodés consultar disponibilidad en Google Calendar, agendar turnos y enviar mails de confirmación.\nNo manejás precios ni pagos.\n\nLÍMITES\nSi no tenés el dato, la consulta es ambigua o está fuera de alcance, respondé exactamente:\n\"No cuento con ese dato. Te derivo con un administrativo.\"\n\n## Formato para WhatsApp\n- Máximo 3 líneas cortas. No hagas párrafos largos.\n- Para resaltar algo usá un asterisco de cada lado: *así*. Nunca uses ** ni #.\n- Si hay una lista, un guion al principio de cada línea.\n- Como máximo un emoji por mensaje, y solo en el saludo inicial.\n\nFAQS OFICIALES Y POLÍTICAS\n- Horario del spa: de 9:00 a 21:00 hs.\n- Instalaciones: piscina, hidromasaje, jacuzzi, gimnasio y sauna.\n- Toallones y batas: se entregan al llegar a la cita.\n- Reservas: los turnos se agendan con anticipación y están sujetos a disponibilidad. Se recomienda llegar 10 minutos antes.\n- Menores de edad: Solo pueden realizarse Masaje relajante y Reflexología, con autorización expresa de madre o padre. No pueden utilizar sauna, hidromasaje, jacuzzi ni gimnasio. El acceso a la piscina está permitido únicamente acompañados de un adulto responsable.\n- Pagos: este canal no gestiona precios, pagos ni señas. Cualquier consulta económica será derivada a un administrativo.\n\nServicios de masajes:\n- Masaje relajante (60 min): Técnica suave que promueve la relajación profunda y el equilibrio del cuerpo.\n- Masaje descontracturante (50 min): Enfocado en liberar tensiones musculares y mejorar la movilidad.\n- Masaje con piedras calientes (70 min): Utiliza piedras volcánicas para una experiencia de calor terapéutico y relajación.\n- Masaje de cuerpo completo (80 min): Sesión integral que trabaja todo el cuerpo de forma armónica.\n- Masaje con aceites esenciales (60 min): Combina técnicas de masaje con aromaterapia para potenciar el bienestar.\n- Reflexología (45 min): Estimulación de puntos reflejos en los pies para favorecer el equilibrio general.\n\nSiempre:\n- Consultá Google Calendar antes de decir si hay o no disponibilidad.\n- Para agendar un turno pedí: nombre y apellido, fecha, horario, servicio y edad.\n- Usá solo la información de las herramientas o de estas FAQs y políticas.\n- Respetá el formato de WhatsApp y el saludo obligatorio.\n- Derivá con la frase exacta cuando no tengas el dato o pidan precios/pagos.\n- Después de agendar un turno, ofrecé enviar el mail de confirmación.\n\nNunca:\n- No inventes precios, disponibilidad, horarios ni servicios.\n- No confirmes un turno sin haber verificado el calendario.\n- No manejes pagos, señas ni links de pago.\n- No saludes de más ni agregues información que no te hayan pedido.\n- No uses más de un emoji y solo en el primer mensaje.\n\nFormato de salida: solo el texto de la respuesta, sin comillas, sin título, sin explicaciones.",
+          "maxIterations": 10,
+          "returnIntermediateSteps": true,
+          "forceToolCallOnFirstIteration": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "a234a40c-4509-4133-af49-655e28e87424",
+      "name": "Recepcionista Spa Ladera"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        256,
+        224
+      ],
+      "id": "dc325682-fcce-4dfb-afae-03bb702e5204",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Usá esta tool SIEMPRE que el cliente pregunte por disponibilidad o por un horario específico. \nConsultá el calendario y respondé claramente si el horario está libre u ocupado. \nNo pidas datos para agendar hasta que el cliente confirme que quiere reservar ese horario. \nSi el resultado está vacío, el horario está disponible. Si hay eventos, está ocupado.",
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "ce162bfcadf057a67d3f026bb1c95c48a915e718ec739574bf25b7ffd460f682@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Spa Ladera"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.4,
+      "position": [
+        384,
+        208
+      ],
+      "id": "59798ff8-d927-4ac5-9865-0c8d44a060d7",
+      "name": "consultar_disponibilidad",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "7jHlR6rkN4FZaMLc",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Usá esta tool SOLO cuando el cliente ya confirmó que quiere agendar y te dio todos los datos: nombre, apellido, servicio, fecha y hora. \nNunca inventes datos. Si falta el apellido o cualquier otro dato, pedilo antes de crear. \nNo crees el turno si el horario está ocupado.",
+        "calendar": {
+          "__rl": true,
+          "value": "ce162bfcadf057a67d3f026bb1c95c48a915e718ec739574bf25b7ffd460f682@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Spa Ladera"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.4,
+      "position": [
+        496,
+        208
+      ],
+      "id": "e92e1a2e-c499-466f-a708-a7ec3123848d",
+      "name": "crear_turno",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "7jHlR6rkN4FZaMLc",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "OBLIGATORIO usar esta tool después de crear un turno. \nEnviá el email de confirmación. \nEl campo To y Subject ya están fijos. Solo completá el Message con los detalles reales del turno creado. \nNunca digas que enviaste la confirmación si no ejecutaste esta tool.",
+        "sendTo": "martinezagustin039@gmail.com",
+        "subject": "Confirmación de turno - Spa Ladera",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        640,
+        208
+      ],
+      "id": "345a2d3e-c9df-475e-a5e2-ea88e74e7696",
+      "name": "enviar_confirmacion",
+      "webhookId": "41ff2b8c-fe32-4f3b-ac06-9210f5af05b3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ajlVY5VbBkLLEYfE",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        96,
+        224
+      ],
+      "id": "6c3ffefd-50f6-42b8-b0b2-8e34b127996c",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "74cyi3cDRk9CaTC3",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat Trigger - Spa Ladera": {
+      "main": [
+        [
+          {
+            "node": "Recepcionista Spa Ladera",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Recepcionista Spa Ladera",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "consultar_disponibilidad": {
+      "ai_tool": [
+        [
+          {
+            "node": "Recepcionista Spa Ladera",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "crear_turno": {
+      "ai_tool": [
+        [
+          {
+            "node": "Recepcionista Spa Ladera",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enviar_confirmacion": {
+      "ai_tool": [
+        [
+          {
+            "node": "Recepcionista Spa Ladera",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Recepcionista Spa Ladera",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "4yEkHixDJ778NqoT",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "80408734-a754-4ebb-a79e-f3c5263aa061",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d978eabdc5108b65c42da7481d5857fe4c1731d496bf0f9f2933130fc0b80186"
+  },
+  "nodeGroups": [],
+  "id": "wHnG58Trt6CfJwQc",
+  "tags": []
+}
